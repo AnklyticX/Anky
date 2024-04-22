@@ -1,0 +1,54 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins',sans-serif;
+  }
+img {
+    width: 200px;
+    height: 200px;
+    padding: 0%;
+    position: relative;
+   
+}
+.th{
+    margin: 0%;
+
+}
+.container{
+    margin-top: 100px;
+    max-width: 700px;
+    width: 100%;
+    background-color: #fff;
+    padding: 25px 30px;
+    border-radius: 5px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+    font-size: 25px;
+    font-weight: 500;
+    position: relative;
+  }
+ 
+td {
+    padding: 15px;
+}
+.rightcontent{
+    margin-left: 250px ;
+}
+
+.rightcontent {
+    border-left: 2px solid rgb(19, 238, 11);
+
+    box-shadow: 2px;
+    padding-bottom: 1px;
+
+
+}
+
+.leftcontent{
+    width: 60%;
+}
+.delete_icon{
+    padding: 0%;
+    margin-left: 20px;
+    margin-top: 10px;
+}
