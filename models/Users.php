@@ -20,26 +20,34 @@ class Users extends ActiveRecord implements IdentityInterface
      * {@inheritdoc}
      */
     public function rules()
-    {
-        return [
-            [['username', 'fullname', 'password', 'email', 'level'], 'required'],
-            [['username'], 'unique'],
-            [['email'], 'unique'],
-            [['level', 'is_deleted'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
-            [['username', 'fullname'], 'string', 'max' => 100],
-            [['email'], 'email'],
-            ['password', 'string', 'min' => 8], // Minimum length of 8 characters
-            ['password', 'validatePasswordComplexity'], // Custom validation for password complexity
-        ];
-    }
+{
+    return [
+        [['username', 'fullname', 'password', 'email', 'level'], 'required'],
+        [['username'], 'unique'],
+        [['email'], 'unique'],
+        [['level', 'is_deleted'], 'integer'],
+        [['created_at', 'updated_at'], 'safe'],
+        [['username', 'fullname'], 'string', 'max' => 100],
+        [['email'], 'email'],
+        ['password', 'string', 'min' => 8], // Minimum length of 8 characters
+        ['password', 'match', 'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', 'message' => 'Password must contain at least one uppercase letter, one lowercase letter, and one digit.'], // Regex validation for password complexity
+    ];
+}
+
 
     public function validatePasswordComplexity($attribute, $params)
-{
-    if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $this->$attribute)) {
-        $this->addError($attribute, 'Password must contain at least one uppercase letter, one lowercase letter, and one digit.');
+    {
+        Yii::info('Validating password complexity...');
+        Yii::info($this->$attribute); // Check the value being validated
+    
+        if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', $this->$attribute)) {
+            Yii::info('Password complexity validation failed.');
+            $this->addError($attribute, 'Password must contain at least one uppercase letter, one lowercase letter, and one digit.');
+        } else {
+            Yii::info('Password complexity validation passed.');
+        }
     }
-}
+    
 
     /**
      * {@inheritdoc}

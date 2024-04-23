@@ -36,7 +36,7 @@
 
 
             // Navbar links for Admin
-            if (Yii::$app->user->identity->level == 1) {
+            if (Yii::$app->user->identity->level == 1 || Yii::$app->user->identity->level == 2 ) {
 
                 echo dmstr\widgets\Menu::widget(
                     [

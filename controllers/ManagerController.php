@@ -100,15 +100,21 @@ class ManagerController extends Controller
     public function actionCreate()
     {
         $model = new Manager();
-
+    
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->manager_id]);
+            Yii::$app->session->setFlash('success', 'Manager created successfully.'); // Set success flash message
+            return $this->redirect(['index']); // Redirect to the index page
         }
-
+    
+        // Check if there are any errors during client creation
+        if ($model->hasErrors()) {
+            Yii::$app->session->setFlash('error', 'Failed to create manager. Please check your input and try again.'); // Set error flash message
+        }
+    
         return $this->render('create', [
             'model' => $model,
         ]);
-    }
+    } 
 
     /**
      * Updates an existing Manager model.

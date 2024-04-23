@@ -22,7 +22,7 @@ use app\models\Manager; // Assuming you have a Manager model
     <?= $form->field($model, 'phonenumber')->textInput() ?>
 
     <?= $form->field($model, 'manager_id')->widget(Select2::className(), [
-        'data' => \yii\helpers\ArrayHelper::map(Manager::find()->orderBy('name')->all(), 'manager_id', 'name'),
+        'data' => \yii\helpers\ArrayHelper::map(Manager::find()->where(['is_deleted' => 0])->orderBy('name')->all(), 'manager_id', 'name'),
         'options' => [
             'placeholder' => 'Select a manager...',
             'onchange' => 'showManagerDetails(this.value)',

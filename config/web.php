@@ -56,15 +56,15 @@ $config = [
         ],
         'db' => $db,
         
-        'urlManager' => [
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
-            'rules' => [
-                // Other URL rules...
+        // 'urlManager' => [
+        //     'enablePrettyUrl' => true,
+        //     'showScriptName' => false,
+        //     'rules' => [
+        //         // Other URL rules...
     
-                'client/get-details/<managerId:\d+>' => 'client/get-details', // Assuming 'client' is the controller ID
-            ],
-        ],
+        //         'client/get-details/<managerId:\d+>' => 'client/get-details', // Assuming 'client' is the controller ID
+        //     ],
+        // ],
 
         'controllerNamespace' => 'app\controllers',
         

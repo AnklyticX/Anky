@@ -45,6 +45,15 @@ use yii\helpers\Url;
                 <?php if (!Yii::$app->user->isGuest): ?>
                   <?= Yii::$app->user->identity->username ?>
                   <small>Email: <?= Yii::$app->user->identity->email ?></small>
+                  <small>
+                    <?php 
+                      if (Yii::$app->user->identity->level == 1) {
+                          echo "Admin";
+                      } else {
+                          echo "Staff";
+                      }
+                    ?>
+                  </small>
                 <?php endif; ?>
               </p>
             </li>

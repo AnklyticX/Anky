@@ -40,6 +40,8 @@ class Client extends \yii\db\ActiveRecord
             [['created_at', 'updated_at'], 'safe'],
             [['phonenumber'], 'match', 'pattern' => '/^\d{10}$/','message' => 'Phone number must contain exactly 10 digits and should be numbers only.'], // Ensure phonenumber contains only digits and is exactly 10 characters long
             [['email'], 'email'],
+            [['email'], 'unique'],
+            [['phonenumber'], 'unique'],
             [['companyname', 'email'], 'string', 'max' => 100],
             [['manager_id'], 'exist', 'skipOnError' => true, 'targetClass' => Manager::className(), 'targetAttribute' => ['manager_id' => 'manager_id']],
         ];

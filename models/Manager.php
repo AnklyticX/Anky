@@ -39,6 +39,8 @@ class Manager extends \yii\db\ActiveRecord
             [['phonenumber', 'is_deleted'], 'integer'],
             [['phonenumber'], 'match', 'pattern' => '/^\d{10}$/','message' => 'Phone number must contain exactly 10 digits and should be numbers only.'], // Ensure phonenumber contains only digits and is exactly 10 characters long
             [['email'], 'email'],
+            [['email'], 'unique'],
+            [['phonenumber'], 'unique'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'email', 'address'], 'string', 'max' => 100],
         ];

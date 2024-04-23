@@ -9,6 +9,8 @@ use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
+use app\models\Manager;
+use app\models\Client;
 use app\models\Users;
 use yii\widgets\ActiveForm;
 use app\controller\ContactForm;
@@ -68,20 +70,17 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        if (!Yii::$app->user->isGuest) {
-           
-            
-         
-    
-        return $this->render('index');
-    
-            
-           
-        }else{
-            return $this->redirect(['/site/login']);
-        }
+        $userCount = Users::find()->count();
+        $managerCount = Manager::find()->count();
+        $clientCount = Client::find()->count();
 
+        return $this->render('index', [
+            'userCount' => $userCount,
+            'managerCount' => $managerCount,
+            'clientCount' => $clientCount,
+        ]);
     }
+
 
  
 
@@ -140,6 +139,32 @@ class SiteController extends Controller
 
         return $this->redirect(['login']);
     }
+
+    public function actionAnalyticsChart()
+{
+    // Fetch data from your tables
+    $userCount = User::find()->count();
+    $managerCount = Manager::find()->count();
+    $clientCount = Client::find()->count();
+
+    // Prepare data for the chart
+    $analyticsData = [
+        ['label' => 'Users', 'count' => $userCount],
+        ['label' => 'Managers', 'count' => $managerCount],
+        ['label' => 'Clients', 'count' => $clientCount],
+    ];
+
+    // Encode data as JSON for use in JavaScript
+    $analyticsDataJson = Json::encode($analyticsData);
+
+    return $this->render('analytics-chart', [
+        'analyticsDataJson' => $analyticsDataJson,
+        'userCount' => $userCount,
+        'managerCount' => $managerCount,
+        'clientCount' => $clientCount,
+    ]);
+}
+
 
     /**
      * Displays contact page.
