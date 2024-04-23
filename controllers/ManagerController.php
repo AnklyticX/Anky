@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
+use yii\data\ActiveDataProvider;
 
 /**
  * ManagerController implements the CRUD actions for Manager model.
@@ -35,16 +36,35 @@ class ManagerController extends Controller
      * @return mixed
      */
     public function actionIndex()
-    {
+{
+    if (!Yii::$app->user->isGuest) {
+        $level = Yii::$app->user->identity->level;
         $searchModel = new SearchManager();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $query = Manager::find();
+
+        // Include deleted records for users with level 1
+        if ($level == 1) {
+            $query->where(['is_deleted' => [0, 1]]);
+        } else {
+            $query->where(['is_deleted' => 0]);
+        }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort' => [
+                'defaultOrder' => [],
+            ],
+        ]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'level' => $level,
         ]);
     }
 
+    return $this->redirect(['/site/index']);
+}
     public function actionGetDetails($managerId)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -119,8 +139,10 @@ class ManagerController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
+        $model = $this->findModel($id);
+        $model->is_deleted = 1;
+        $model->save(false); // Save without validation
+    
         return $this->redirect(['index']);
     }
 

@@ -10,6 +10,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
 use app\models\Manager;
+use yii\data\ActiveDataProvider;
 
 /**
  * ClientController implements the CRUD actions for Client model.
@@ -39,15 +40,34 @@ class ClientController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new SearchClient();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        if (!Yii::$app->user->isGuest) {
+            $level = Yii::$app->user->identity->level;
+            $searchModel = new SearchClient();
+            $query = Client::find();
+    
+            // Include deleted records for users with level 1
+            if ($level == 1) {
+                $query->where(['is_deleted' => [0, 1]]);
+            } else {
+                $query->where(['is_deleted' => 0]);
+            }
+    
+            $dataProvider = new ActiveDataProvider([
+                'query' => $query,
+                'sort' => [
+                    'defaultOrder' => [],
+                ],
+            ]);
+    
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'level' => $level,
+            ]);
+        }
+    
+        return $this->redirect(['/site/index']);
     }
-
     /**
      * Displays a single Client model.
      * @param integer $id
@@ -123,8 +143,10 @@ class ClientController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
+        $model = $this->findModel($id);
+        $model->is_deleted = 1;
+        $model->save(false); // Save without validation
+    
         return $this->redirect(['index']);
     }
 
