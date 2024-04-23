@@ -41,55 +41,34 @@ class UsersController extends Controller
      * @return mixed
      */
     public function actionIndex()
-    {
-        if (!Yii::$app->user->isGuest) {
-            if(Yii::$app->user->identity->level == 3)
-            {
-                $usn = Yii::$app->user->identity->user_id;
-                $searchModel = new SearchUsers();
-                $query = Users::find()->where(['user_id' => $usn]);
-                $dataProvider = new ActiveDataProvider([
-                    'query' => $query,
-                    'sort' => [
-                        'defaultOrder' => [
-                           
-                            
-                            
-                            
-                        ]
-                    ],
-                ]);
-                
-               
-      
-                $query->andFilterWhere(['user_id' => $usn]);
-                return $this->render('index', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
-                    
-                    'mentor_id' => $usn
-                ]);
-            }
-    }
+{
+    if (!Yii::$app->user->isGuest) {
+        $level = Yii::$app->user->identity->level;
+        $searchModel = new SearchUsers();
+        $query = Users::find();
 
-    if(Yii::$app->user->identity->level == 1)
-            {
-                $searchModel = new SearchUsers();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        // Include deleted records for users with level 1
+        if ($level == 1) {
+            $query->where(['is_deleted' => [0, 1]]);
+        } else {
+            $query->where(['is_deleted' => 0]);
+        }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort' => [
+                'defaultOrder' => [],
+            ],
+        ]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'level' => $level,
         ]);
-
-            }
-   
-
-    
-    else
-    {
-    return $this->redirect(['/site/index']);
     }
+
+    return $this->redirect(['/site/index']);
 }
     
 
@@ -212,11 +191,16 @@ class UsersController extends Controller
     public function actionCreate()
     {
         $model = new Users();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+    
+        if ($model->load(Yii::$app->request->post())) {
+            // Generate password hash
+            $model->password = Yii::$app->security->generatePasswordHash($model->password);
+            
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
-
+    
         return $this->render('create', [
             'model' => $model,
         ]);
@@ -232,11 +216,16 @@ class UsersController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+    
+        if ($model->load(Yii::$app->request->post())) {
+            // Generate password hash
+            $model->password = Yii::$app->security->generatePasswordHash($model->password);
+            
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
-
+    
         return $this->render('update', [
             'model' => $model,
         ]);
@@ -251,8 +240,10 @@ class UsersController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
+        $model = $this->findModel($id);
+        $model->is_deleted = 1;
+        $model->save(false); // Save without validation
+    
         return $this->redirect(['index']);
     }
 
@@ -276,37 +267,7 @@ class UsersController extends Controller
         }
     }
 
-    public function actionMentee()
-    {
-        if(!Yii::$app->user->isGuest){
-            $usn = Yii::$app->user->identity->mentor_id;
-            $searchModel = new SearchUsers();
-            $query = Users::find()->where(['hasMentor' => 'Yes']);
-            $dataProvider = new ActiveDataProvider([
-                'query' => $query,
-                'sort' => [
-                    'defaultOrder' => [
-                       
-                        
-                        
-                        
-                    ]
-                ],
-            ]);
-            
-           
-  
-            $query->andFilterWhere(['mentor_id' => $usn]);
-            return $this->render('mentee', [
-                'searchModel' => $searchModel,
-                'dataProvider' => $dataProvider,
-                
-                'mentor_id' => $usn
-            ]);
-        }else{
-            return $this->redirect(['/site/login']);
-        } 
-    }
+    
 
 
     /**

@@ -91,7 +91,7 @@ $formClass = 'modern-form';
     </div>
     
     <div class="form-group">
-        <?= $form->field($model, 'level')->dropDownList(['1' => 'User', 'admin' => 'Admin'], ['prompt' => 'Select Role', 'class' => 'form-control'])->label('Role') ?>
+        <?= $form->field($model, 'level')->dropDownList(['1' => 'Admin', '2' => 'Staff'], ['prompt' => 'Select Role', 'class' => 'form-control'])->label('Role') ?>
     </div>
 
   
