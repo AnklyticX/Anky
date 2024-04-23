@@ -33,10 +33,49 @@ $this->params['breadcrumbs'][] = $this->title;
             'companyname',
             'email:email',
             'phonenumber',
-            'manager_id',
+            [
+                'attribute' => 'manager_id',
+                'value' => function ($model) {
+                    return $model->manager->name; 
+                },
+            ],
+            [
+                'attribute' => 'manager_id',
+                'label'=>'Email',
+                'value' => function ($model) {
+                    return $model->manager->email; // Assuming 'name' is the attribute containing the manager's name
+                },
+            ],
+            [
+                'attribute' => 'manager_id',
+                'label'=>'Address',
+                'value' => function ($model) {
+                    return $model->manager->address; // Assuming 'name' is the attribute containing the manager's name
+                },
+            ],
+            [
+                'attribute' => 'manager_id',
+                'label'=>'Phone Number',
+                'value' => function ($model) {
+                    return $model->manager->phonenumber; // Assuming 'name' is the attribute containing the manager's name
+                },
+            ],
             'created_at',
             'updated_at',
-            'is_deleted',
+            [
+                'attribute' => 'is_deleted',
+                'label'=>'Status',
+                'value' => function ($model) {
+                    if($model->is_deleted == 1)
+                    {
+                        return "InActive";
+                    }
+                    else
+                    {
+                        return "Active";
+                    }
+                },
+            ],
         ],
     ]) ?>
 

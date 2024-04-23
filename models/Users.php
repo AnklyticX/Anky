@@ -23,6 +23,8 @@ class Users extends ActiveRecord implements IdentityInterface
     {
         return [
             [['username', 'fullname', 'password', 'email', 'level'], 'required'],
+            [['username'], 'unique'],
+            [['email'], 'unique'],
             [['level', 'is_deleted'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['username', 'fullname'], 'string', 'max' => 100],

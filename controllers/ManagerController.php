@@ -8,6 +8,7 @@ use app\models\SearchManager;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * ManagerController implements the CRUD actions for Manager model.
@@ -42,6 +43,20 @@ class ManagerController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    public function actionGetDetails($managerId)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        $manager = Manager::findOne($managerId);
+        if ($manager) {
+            return $this->renderAjax('_manager_details', [
+                'manager' => $manager,
+            ]);
+        } else {
+            return ['error' => 'Manager not found'];
+        }
     }
 
     /**

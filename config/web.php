@@ -60,11 +60,9 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                'faculty/search' => 'faculty/search',
-                'faculty/locate/<facultyId:\d+>' => 'faculty/locate',
-                'faculty/search-form' => 'faculty/search-form',
-                'batch-input' => 'allotment/batch-input-form',
-                
+                // Other URL rules...
+    
+                'client/get-details/<managerId:\d+>' => 'client/get-details', // Assuming 'client' is the controller ID
             ],
         ],
 

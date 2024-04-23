@@ -8,6 +8,8 @@ use app\models\SearchClient;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
+use app\models\Manager;
 
 /**
  * ClientController implements the CRUD actions for Client model.
@@ -28,6 +30,8 @@ class ClientController extends Controller
             ],
         ];
     }
+
+  
 
     /**
      * Lists all Client models.
@@ -55,6 +59,21 @@ class ClientController extends Controller
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
+    }
+
+
+    public function actionGetDetails($managerId)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        $manager = Manager::findOne($managerId);
+        if ($manager) {
+            return $this->renderAjax('_manager_details', [
+                'manager' => $manager,
+            ]);
+        } else {
+            return ['error' => 'Manager not found'];
+        }
     }
 
     /**

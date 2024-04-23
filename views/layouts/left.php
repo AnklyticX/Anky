@@ -43,11 +43,13 @@
                         'options' => ['class' => 'sidebar-menu tree', 'data-widget' => 'tree'],
                         'items' => [
                             [
-                                'label' => 'Settings',
+                                'label' => 'Configurations',
                                 'icon' => 'bug',
                                 'url' => '#',
                                 'items' => [
                                     ['label' => 'Users', 'icon' => 'circle-o', 'url' => ['/users'],],
+                                    ['label' => 'Clients', 'icon' => 'circle-o', 'url' => ['/client'],],
+                                    ['label' => 'Manager', 'icon' => 'circle-o', 'url' => ['/manager'],],
                                     
 
 
