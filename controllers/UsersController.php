@@ -4,10 +4,17 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Users;
-use app\models\SearchUsers;
+use yii\web\UploadedFile;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
+use app\models\Password;
+use app\models\SearchUsers;
+use yii\data\ActiveDataProvider;
+use app\models\ResetPassword;
+
 
 /**
  * UsersController implements the CRUD actions for Users model.
@@ -35,14 +42,56 @@ class UsersController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new SearchUsers();
+        if (!Yii::$app->user->isGuest) {
+            if(Yii::$app->user->identity->level == 3)
+            {
+                $usn = Yii::$app->user->identity->user_id;
+                $searchModel = new SearchUsers();
+                $query = Users::find()->where(['user_id' => $usn]);
+                $dataProvider = new ActiveDataProvider([
+                    'query' => $query,
+                    'sort' => [
+                        'defaultOrder' => [
+                           
+                            
+                            
+                            
+                        ]
+                    ],
+                ]);
+                
+               
+      
+                $query->andFilterWhere(['user_id' => $usn]);
+                return $this->render('index', [
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
+                    
+                    'mentor_id' => $usn
+                ]);
+            }
+    }
+
+    if(Yii::$app->user->identity->level == 1)
+            {
+                $searchModel = new SearchUsers();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+
+            }
+   
+
+    
+    else
+    {
+    return $this->redirect(['/site/index']);
     }
+}
+    
 
     /**
      * Displays a single Users model.
@@ -55,8 +104,106 @@ class UsersController extends Controller
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
+       
     }
+/*
+    public function actionForgotPassword()
+    {
+           if (Yii::$app->user->isGuest) 
+           {
+        $email = "";
+        $alert = 0;
+        if (Yii::$app->request->post("email")) {
+           $email = Yii::$app->request->post("email");
+           $user = Users::find()
+                            ->where(['email' => $email])
+                            ->one();
+            $check_date = date("Y-m-d H:i:s", strtotime('-15 minutes'));
+            $links = ResetPassword::find()
+                                ->where(['email' => $email])
+                                ->andWhere(['>','created_at', $check_date])
+                                ->all();
+            if(!$user){
+                $alert = 1;
+            }else if($links){
+                $alert = 3;
+            }else{
+                
+                $string = microtime() . $user->user_id;
+               
+                $url = "localhost/tech/web/users/change-password-rest";
+                $result = Yii::$app->mailer->compose('reset_template', ['url' => $url])
+                                ->setFrom('admin@git-mca.xyz')
+                                ->setTo($email)
+                                ->setSubject('Reset Password to Aptitude System')
+                                ->send();
+                if($result){
+                    $alert = 2;
+                    $reset_password = new ResetPassword();
+                    $reset_password->email = $email;
+                    $reset_password->reset_hash = $hash;
+                    $reset_password->save();
+                }else{
+                    $alert = 4;
+                }
+                //send email
+            }
+           
+        }
+        
+           }
+     
+        return $this->render('forgot-password',[
+            'alert' => $alert,
+        ]);
+    }
+    
+    public function actionForgotPasswordReset()
+    {
+        $alert = 0;
+        $model = new Users();
+        if(Yii::$app->request->get('user') && Yii::$app->request->get('email')){
+            $email = Yii::$app->request->get('email');
+            $hash = Yii::$app->request->get('user');
+            $check_date = date("Y-m-d H:i:s", strtotime('-15 minutes'));
+            $result = ResetPassword::find()
+                            ->where(['email' => $email])
+                            ->andWhere(['reset_hash' => $hash])
+                            ->andWhere(['>','created_at', $check_date])
+                            ->one();
+            if($result){
+                $model = Users::find()
+                            ->where(['email' => $email])
+                            ->one();
+            }else{
+                return $this->render('error');
 
+            }
+        }
+        $password = $model->password;
+        $model->scenario = Users::SCENARIO_FORGOT_PASS;
+        if(Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())){
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+        
+        if ($model->load(Yii::$app->request->post())) {
+               
+                $model->password_repeat = $model->password;
+                if($model->save()){
+                    ResetPassword::deleteAll(['email' => $model->email]);
+                    $alert = 1;
+                }
+            //return $this->redirect(['view','id' => $model->user_id]);
+        }
+        $model->password = "";
+        $model->password_repeat = "";
+        return $this->render('change-password-rest', [
+            'model' => $model,
+            'alert' => $alert,
+        ]);
+    }
+*/
     /**
      * Creates a new Users model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -67,7 +214,7 @@ class UsersController extends Controller
         $model = new Users();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->user_id]);
+            return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('create', [
@@ -87,7 +234,7 @@ class UsersController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->user_id]);
+            return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('update', [
@@ -108,6 +255,59 @@ class UsersController extends Controller
 
         return $this->redirect(['index']);
     }
+
+    public function actionChangePassword()
+    {
+        if (!Yii::$app->user->isGuest) {
+            $model = new Password();
+            
+            if($model->load(Yii::$app->request->post())){
+                $user = Users::find()->where(['user_id' => Yii::$app->user->identity->user_id])->one();
+                $user->password =  $model->password1;
+                $user->save(false);
+                $this->redirect(['/site/index']);
+            }
+            return $this->render('change-password', [
+                'model' => $model,
+            ]);
+            
+        }else{
+            throw new \yii\web\ForbiddenHttpException;
+        }
+    }
+
+    public function actionMentee()
+    {
+        if(!Yii::$app->user->isGuest){
+            $usn = Yii::$app->user->identity->mentor_id;
+            $searchModel = new SearchUsers();
+            $query = Users::find()->where(['hasMentor' => 'Yes']);
+            $dataProvider = new ActiveDataProvider([
+                'query' => $query,
+                'sort' => [
+                    'defaultOrder' => [
+                       
+                        
+                        
+                        
+                    ]
+                ],
+            ]);
+            
+           
+  
+            $query->andFilterWhere(['mentor_id' => $usn]);
+            return $this->render('mentee', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                
+                'mentor_id' => $usn
+            ]);
+        }else{
+            return $this->redirect(['/site/login']);
+        } 
+    }
+
 
     /**
      * Finds the Users model based on its primary key value.

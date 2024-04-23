@@ -25,7 +25,8 @@ class Users extends ActiveRecord implements IdentityInterface
             [['username', 'fullname', 'password', 'email', 'level'], 'required'],
             [['level', 'is_deleted'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['username', 'fullname', 'email'], 'string', 'max' => 100],
+            [['username', 'fullname'], 'string', 'max' => 100],
+            [['email'], 'email'],
             ['password', 'string', 'min' => 8], // Minimum length of 8 characters
             ['password', 'validatePasswordComplexity'], // Custom validation for password complexity
         ];
@@ -46,7 +47,7 @@ class Users extends ActiveRecord implements IdentityInterface
         return [
             'user_id' => 'User ID',
             'username' => 'Username',
-            'fullname' => 'Fullname',
+            'fullname' => 'Full Name',
             'password' => 'Password',
             'email' => 'Email',
             'level' => 'Level',
